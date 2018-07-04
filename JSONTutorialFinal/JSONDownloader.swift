@@ -24,6 +24,7 @@ struct JSONDownloader {
     typealias JSON = [String: AnyObject]
     typealias JSONTaskCompletionHandler = (Result<JSON>) -> ()
     
+    
     func jsonTask(with request: URLRequest, completionHandler completion: @escaping JSONTaskCompletionHandler) -> URLSessionDataTask { 
         
         let task = session.dataTask(with: request) { (data, response, error) in
@@ -50,7 +51,7 @@ struct JSONDownloader {
                 }
             } else {
                 completion(.Error(.responseUnsuccessful))
-                print("\(error)")
+                print("\(String(describing: error))")
             }
         }
         return task
@@ -69,4 +70,16 @@ enum ItunesApiError: Error {
     case responseUnsuccessful
     case invalidURL
     case jsonParsingFailure
+}
+public class JSONRequest<T: Decodable>: NSObject {
+    // completion handler defined in terms of `T`
+    public typealias JSONCompletionHandler = ([T]?, NSError?) -> Void
+    
+    // no further changes
+    public var completionHandler: JSONCompletionHandler
+    public var endPoint: String
+    public init(endPoint: String, completionHandler: @escaping JSONCompletionHandler) {
+        self.endPoint = endPoint
+        self.completionHandler = completionHandler
+    }
 }
